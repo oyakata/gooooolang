@@ -7,6 +7,7 @@ import (
 	"encoding/base64"
 	"io/ioutil"
 	"log"
+	"net/url"
 )
 
 var (
@@ -46,7 +47,7 @@ func EncryptBase64URLString(msg []byte) (string, error) {
 		return "", err
 	}
 
-	return base64.URLEncoding.EncodeToString(b), nil
+	return url.QueryEscape(base64.StdEncoding.EncodeToString(b)), nil
 }
 
 func Decrypt(msg []byte) ([]byte, error) {
@@ -54,7 +55,12 @@ func Decrypt(msg []byte) ([]byte, error) {
 }
 
 func DecryptBase64URLString(s string) ([]byte, error) {
-	msg, err := base64.URLEncoding.DecodeString(s)
+	decoded, err := url.QueryUnescape(s)
+	if err != nil {
+		return nil, err
+	}
+
+	msg, err := base64.StdEncoding.DecodeString(decoded)
 	if err != nil {
 		return nil, err
 	}
