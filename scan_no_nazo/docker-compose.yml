@@ -1,5 +1,8 @@
 version: "3"
 
+volumes:
+  gohome:
+
 services:
   mysql:
     image: "mysql:5.7"
@@ -10,13 +13,27 @@ services:
     volumes:
       - "./fixture/mysql/init:/docker-entrypoint-initdb.d"
 
-  app:
+  hello:
     image: "golang:latest"
     build: .
     tty: true
     working_dir: /workspace
     volumes:
-      - .:/workspace
+      - gohome:/workspace/go
+      - ./hello:/workspace
+    environment:
+      TZ: "Asia/Tokyo"
+    depends_on:
+      - mysql
+
+  hello2:
+    image: "golang:latest"
+    build: .
+    tty: true
+    working_dir: /workspace
+    volumes:
+      - gohome:/workspace/go
+      - ./hello2:/workspace
     environment:
       TZ: "Asia/Tokyo"
     depends_on:
