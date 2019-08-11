@@ -1,8 +1,5 @@
 version: "3"
 
-volumes:
-  gohome:
-
 services:
   mysql:
     image: "mysql:5.7"
@@ -15,11 +12,9 @@ services:
 
   hello:
     image: "golang:latest"
-    build: .
     tty: true
     working_dir: /workspace
     volumes:
-      - gohome:/workspace/go
       - ./hello:/workspace
     environment:
       TZ: "Asia/Tokyo"
@@ -28,11 +23,9 @@ services:
 
   hello2:
     image: "golang:latest"
-    build: .
     tty: true
     working_dir: /workspace
     volumes:
-      - gohome:/workspace/go
       - ./hello2:/workspace
     environment:
       TZ: "Asia/Tokyo"
