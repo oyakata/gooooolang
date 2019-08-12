@@ -14,6 +14,8 @@ func main() {
 	}()
 
 	for {
-		fmt.Println(m[rand.Intn(100000)])
+		for k, v := range m {
+			fmt.Println(k, v)
+		}
 	}
 }
