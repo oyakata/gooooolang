@@ -1,0 +1,9 @@
+version: "3"
+
+services:
+  develop:
+    image: "golang:latest"
+    tty: true
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
