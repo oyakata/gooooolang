@@ -4,10 +4,16 @@ import (
 	"database/sql"
 	"log"
 
-	_ "github.com/go-sql-driver/mysql"
-
-	"github.com/jmoiron/sqlx"
+	mysql "github.com/go-sql-driver/mysql"
 )
+
+type Student struct {
+	ID     int
+	Active bool
+	Name   string
+	Grade  int
+	Score  float64
+}
 
 type NullableStudent struct {
 	ID     int
@@ -18,14 +24,19 @@ type NullableStudent struct {
 }
 
 func main() {
-	conn, err := sql.Open("mysql", "root:@tcp(mysql:3306)/scan_no_nazo")
+	cfg := mysql.NewConfig()
+	cfg.User = "root"
+	cfg.Net = "tcp"
+	cfg.Addr = "mysql:3306"
+	cfg.DBName = "scan_no_nazo"
+
+	db, err := sql.Open("mysql", cfg.FormatDSN())
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer conn.Close()
+	defer db.Close()
 
-	db := sqlx.NewDb(conn, "mysql")
-	rows, err := db.Queryx(`SELECT id, active, name, grade, score FROM students`)
+	rows, err := db.Query(`SELECT id, active, name, grade, score FROM students`)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,13 +44,22 @@ func main() {
 
 	for rows.Next() {
 		s := NullableStudent{}
-		if err := rows.StructScan(&s); err != nil {
+		if err := rows.Scan(&s.ID, &s.Active, &s.Name, &s.Grade, &s.Score); err != nil {
 			log.Fatal(err)
 		}
-		log.Println(s)
-	}
-	/*
-	   ===== 実行結果 =====
 
-	*/
+		st := Student{
+			ID:     s.ID,
+			Active: s.Active.Bool,
+			Name:   s.Name.String,
+			Grade:  int(s.Grade.Int64),
+			Score:  s.Score.Float64,
+		}
+		log.Println(st)
+		/*
+		   2019/08/12 09:17:52 {1 true John Doe 65535 0.009876}
+		   2019/08/12 09:17:52 {2 false  0 0}
+		   2019/08/12 09:17:52 {3 false Akira Toriyama 0 100}
+		*/
+	}
 }
