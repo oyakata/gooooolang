@@ -31,3 +31,14 @@ services:
       TZ: "Asia/Tokyo"
     depends_on:
       - mysql
+
+  hello3:
+    image: "golang:latest"
+    tty: true
+    working_dir: /workspace
+    volumes:
+      - ./hello3:/workspace
+    environment:
+      TZ: "Asia/Tokyo"
+    depends_on:
+      - mysql
